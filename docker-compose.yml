@@ -1,12 +1,11 @@
-# NOTE: The GHCR image (ghcr.io/rightnow-ai/openfang) is not yet public.
-# For now, build from source using `docker compose up --build`.
-# See: https://github.com/RightNow-AI/openfang/issues/12
+# NOTE: Using custom GHCR image for P1 improvements
+# Build and push manually with: docker buildx build --platform linux/arm64 --tag ghcr.io/dinopollece/openfang:latest --load .
 
 version: "3.8"
 services:
   openfang:
-    build: .
-    # image: ghcr.io/rightnow-ai/openfang:latest  # Uncomment when GHCR is public
+    image: ghcr.io/dinopollece/openfang:latest
+    # build: .  # Uncomment to build locally instead of pulling from GHCR
     ports:
       - "4200:4200"
     volumes:

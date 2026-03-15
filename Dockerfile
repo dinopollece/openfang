@@ -32,3 +32,8 @@ VOLUME /data
 ENV OPENFANG_HOME=/data
 ENTRYPOINT ["openfang"]
 CMD ["start"]
+
+# Labels para identificar versión P1
+LABEL version="1.0.1-p1-improvements"
+LABEL description="OpenFang con mejoras UI/UX P1 (Claude style)"
+LABEL improvements="smooth-streaming,subtle-shadows,premium-code-blocks,compact-mode"
