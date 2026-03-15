@@ -23,6 +23,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-venv \
     nodejs \
     npm \
+    chromium \
+    chromium-driver \
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /build/target/release/openfang /usr/local/bin/
@@ -30,10 +33,12 @@ COPY --from=builder /build/agents /opt/openfang/agents
 EXPOSE 4200
 VOLUME /data
 ENV OPENFANG_HOME=/data
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROME_PATH=/usr/bin/chromium
 ENTRYPOINT ["openfang"]
 CMD ["start"]
 
 # Labels para identificar versión P1
-LABEL version="1.0.1-p1-improvements"
-LABEL description="OpenFang con mejoras UI/UX P1 (Claude style)"
-LABEL improvements="smooth-streaming,subtle-shadows,premium-code-blocks,compact-mode"
+LABEL version="1.0.2-p1-improvements-chromium"
+LABEL description="OpenFang con mejoras UI/UX P1 (Claude style) + Chromium support"
+LABEL improvements="smooth-streaming,subtle-shadows,premium-code-blocks,compact-mode,chromium-browser"
