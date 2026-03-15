@@ -312,3 +312,29 @@
 .app-layout.focus-mode .sidebar-overlay { display: none; }
 .app-layout.focus-mode .main-content { max-width: 100%; margin-left: 0; }
 .app-layout.focus-mode .mobile-menu-btn { display: none !important; }
+
+/* Compact mode toggle */
+.compact-toggle {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+
+.compact-toggle:hover {
+  background: var(--surface2);
+}
+
+.compact-toggle svg {
+  transition: transform var(--transition-fast);
+}
+
+.app-layout.compact-mode .compact-toggle svg {
+  transform: scale(0.9);
+  color: var(--accent);
+}
+
