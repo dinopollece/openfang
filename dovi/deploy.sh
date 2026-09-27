@@ -15,6 +15,13 @@ for skill in planning-system task-tracking session-feedback; do
   cp "${REPO}/dovi/skills/${skill}/SKILL.md" "${OPENFANG_HOME}/skills/${skill}/SKILL.md"
 done
 
+echo "Deploying Obi game-development agent..."
+if [ -f "${REPO}/dovi/obi/install_pi.py" ]; then
+  python3 "${REPO}/dovi/obi/install_pi.py"
+else
+  echo "Obi package missing; run infra/openfang/scripts/sync-to-fork.ps1 from the DoVi Games repository."
+fi
+
 echo "Deploying OpenFang binary..."
 if [ -n "${OPENFANG_BINARY:-}" ] && [ -f "${OPENFANG_BINARY}" ]; then
   cp "${OPENFANG_BINARY}" "${OPENFANG_HOME}/bin/openfang"

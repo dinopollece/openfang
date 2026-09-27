@@ -4,6 +4,13 @@ This log lists changes made to the OpenFang fork for DoVi. It covers repository 
 
 When adding a fork-specific change, record its purpose, implementation files, source contract, and whether it still needs to live in the runtime. Mark a change as retired if upstream or `dovi-mcp` replaces it.
 
+## 2026-09-27 — Obi game-development agent
+
+- Added `obi-director` and the Godot, Blender, and prototype-judge skills/templates as deployment copies in `dovi/obi/`. The director coordinates tasks with shared files and calls a narrowly scoped `obipc` MCP bridge on the Windows game-development PC. It does not use `dovi-mcp` as the task ledger.
+- Added `dovi/obi/install_pi.py` to preserve existing task data, back up replaced manifests/configuration, install the agent workspace/skills, and register the `obipc` stdio adapter. `dovi/deploy.sh` invokes the installer before restarting OpenFang.
+- Canonical prompts, skills, templates, bridge code, and generated bundle live in the DoVi Games repository at `infra/openfang/`; `infra/openfang/scripts/sync-to-fork.ps1` refreshes only the generated copies. Review and update this entry when those source files change.
+- This agent setup is configuration and a PC bridge; it does not change the OpenFang Rust runtime. The native `agent_send` trace described below remains a separate DoVi runtime change.
+
 ## 2026-09-27 — Upstream v0.6.9 and coordination traces
 
 - **Upstream baseline:** merged `RightNow-AI/openfang@acf2587` (v0.6.9) into the DoVi branch. This is an upstream update, not a DoVi-specific feature.
