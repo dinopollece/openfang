@@ -487,6 +487,7 @@ impl MemorySubstrate {
     }
 
     /// Post a new task with a typed JSON payload to the shared queue.
+    #[allow(clippy::too_many_arguments)]
     pub async fn task_post_with_payload(
         &self,
         title: &str,

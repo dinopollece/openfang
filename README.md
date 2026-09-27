@@ -27,6 +27,10 @@
 
 ---
 
+**DoVi fork:** [Fork-specific changes and migration boundaries](dovi/CHANGELOG.md).
+
+---
+
 > **v0.5.10 (April 2026)**
 >
 > OpenFang is feature complete but still pre-1.0. Expect rough edges and breaking changes between minor versions. We ship fast and fix fast. Pin to a specific commit for production use until v1.0. [Report issues here.](https://github.com/RightNow-AI/openfang/issues)
