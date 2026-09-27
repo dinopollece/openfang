@@ -44,7 +44,9 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: openfang-aarch64-${{ github.ref_name }}-${{ github.sha }}
+          # Branch names like release/obi-v1 contain slashes, which artifact
+          # names reject. The run number keeps each uploaded build distinct.
+          name: openfang-aarch64-${{ github.run_number }}-${{ github.sha }}
           path: |
             openfang-aarch64-unknown-linux-gnu.tar.gz
             openfang-aarch64-unknown-linux-gnu.tar.gz.sha256
