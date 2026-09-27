@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - dovi-feedback-tools
+      - 'release/**'
 
 env:
   CARGO_TERM_COLOR: always
@@ -43,7 +44,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: openfang-aarch64-unknown-linux-gnu
+          name: openfang-aarch64-${{ github.ref_name }}-${{ github.sha }}
           path: |
             openfang-aarch64-unknown-linux-gnu.tar.gz
             openfang-aarch64-unknown-linux-gnu.tar.gz.sha256
+          retention-days: 3

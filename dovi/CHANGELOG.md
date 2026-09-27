@@ -8,6 +8,10 @@ When adding a fork-specific change, record its purpose, implementation files, so
 
 - Removed `.github/workflows/release.yml` so pushing a version tag cannot publish GitHub release assets, auto-updater metadata, or container images. Reintroduce a DoVi-specific release workflow when cloud versioning and distribution are in scope.
 
+## 2026-09-27 — Raspberry release-branch builds
+
+- Extended the Raspberry Pi cross-build to branches matching `release/**`. Each run uploads the ARM64 binary and SHA-256 checksum as a temporary Actions artifact with three-day retention. It does not deploy to the Pi; deployment remains a separate local SSH step.
+
 ## 2026-09-27 — Obi game-development agent
 
 - Added `obi-director` and the Godot, Blender, and prototype-judge skills/templates as deployment copies in `dovi/obi/`. The director coordinates tasks with shared files and calls a narrowly scoped `obipc` MCP bridge on the Windows game-development PC. It does not use `dovi-mcp` as the task ledger.
