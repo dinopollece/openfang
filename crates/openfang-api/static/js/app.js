@@ -18,7 +18,7 @@ if (typeof marked !== 'undefined') {
 function escapeHtml(text) {
   var div = document.createElement('div');
   div.textContent = text || '';
-  return div.innerHTML;
+  return div.innerHTML.replace(/\n/g, '<br>');
 }
 
 function renderMarkdown(text) {
@@ -313,7 +313,7 @@ function app() {
       });
 
       // Hash routing
-      var validPages = ['overview','agents','sessions','approvals','comms','workflows','scheduler','channels','skills','hands','analytics','logs','runtime','settings','wizard'];
+      var validPages = ['overview','agents','sessions','approvals','comms','feedbacks','workflows','scheduler','channels','skills','hands','analytics','logs','runtime','settings','wizard'];
       var pageRedirects = {
         'chat': 'agents',
         'templates': 'agents',

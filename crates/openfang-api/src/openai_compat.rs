@@ -235,7 +235,12 @@ fn convert_messages(oai_messages: &[OaiMessage]) -> Vec<Message> {
                 OaiContent::Null => return None,
             };
 
-            Some(Message { role, content })
+            Some(Message {
+                msg_id: uuid::Uuid::new_v4().to_string(),
+                provider_msg_id: None,
+                role,
+                content,
+            })
         })
         .collect()
 }
@@ -310,7 +315,7 @@ pub async fn chat_completions(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
                     "error": {
-                        "message": format!("{e}"),
+                        "message": e.to_string(),
                         "type": "server_error"
                     }
                 })),

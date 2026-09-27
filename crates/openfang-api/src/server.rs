@@ -187,6 +187,10 @@ pub async fn build_router(
                 .patch(routes::patch_agent),
         )
         .route(
+            "/api/agents/{id}/uninstall",
+            axum::routing::delete(routes::uninstall_agent),
+        )
+        .route(
             "/api/agents/{id}/mode",
             axum::routing::put(routes::set_agent_mode),
         )
@@ -197,6 +201,12 @@ pub async fn build_router(
         )
         .route(
             "/api/agents/{id}/start",
+            axum::routing::post(routes::restart_agent),
+        )
+        .route(
+            // Issue #890 — alias so dashboards and external orchestrators can
+            // wake an inactive agent via a verb that matches the agent_activate tool.
+            "/api/agents/{id}/activate",
             axum::routing::post(routes::restart_agent),
         )
         .route(
@@ -384,6 +394,11 @@ pub async fn build_router(
             "/api/skills/reload",
             axum::routing::post(routes::reload_skills),
         )
+        // Audit trail (issue #1174 — instance-side wrapper integration)
+        .route(
+            "/api/audit/append",
+            axum::routing::post(routes::audit_append),
+        )
         .route(
             "/api/skills/{id}/config",
             axum::routing::get(routes::get_skill_config).put(routes::put_skill_config),
@@ -502,6 +517,10 @@ pub async fn build_router(
         .route(
             "/api/comms/events/stream",
             axum::routing::get(routes::comms_events_stream),
+        )
+        .route(
+            "/api/comms/events/{id}",
+            axum::routing::get(routes::comms_event_detail),
         )
         .route("/api/comms/send", axum::routing::post(routes::comms_send))
         .route("/api/comms/task", axum::routing::post(routes::comms_task));
@@ -666,6 +685,11 @@ pub async fn build_router(
         .route(
             "/api/bindings/{index}",
             axum::routing::delete(routes::remove_binding),
+        )
+        // Feedback task visibility
+        .route(
+            "/api/feedbacks",
+            axum::routing::get(routes::list_feedback_tasks),
         )
         // A2A (Agent-to-Agent) Protocol endpoints
         .route(

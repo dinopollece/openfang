@@ -37,11 +37,31 @@ pub trait KernelHandle: Send + Sync {
     /// Send a message to another agent and get the response.
     async fn send_to_agent(&self, agent_id: &str, message: &str) -> Result<String, String>;
 
+    /// Send from a known agent. Runtimes can use the source for communication telemetry.
+    async fn send_to_agent_from(
+        &self,
+        source_agent_id: &str,
+        agent_id: &str,
+        message: &str,
+    ) -> Result<String, String> {
+        let _ = source_agent_id;
+        self.send_to_agent(agent_id, message).await
+    }
+
     /// List all running agents.
     fn list_agents(&self) -> Vec<AgentInfo>;
 
     /// Kill an agent by ID.
     fn kill_agent(&self, agent_id: &str) -> Result<(), String>;
+
+    /// Activate (wake up) an inactive agent by ID, flipping its state to Running.
+    /// Used by orchestrator agents to dispatch work to currently inactive agents
+    /// (Suspended, Crashed, or never-started). Terminated agents cannot be revived.
+    /// Returns the agent's name on success.
+    fn activate_agent(&self, agent_id: &str) -> Result<String, String> {
+        let _ = agent_id;
+        Err("Agent activation not available".to_string())
+    }
 
     /// Store a value in shared memory (cross-agent accessible).
     fn memory_store(&self, key: &str, value: serde_json::Value) -> Result<(), String>;
@@ -69,6 +89,26 @@ pub trait KernelHandle: Send + Sync {
 
     /// List tasks, optionally filtered by status.
     async fn task_list(&self, status: Option<&str>) -> Result<Vec<serde_json::Value>, String>;
+
+    /// Capture user feedback and enqueue background analysis.
+    async fn feedback_capture(
+        &self,
+        caller_agent_id: &str,
+        input: serde_json::Value,
+    ) -> Result<serde_json::Value, String> {
+        let _ = (caller_agent_id, input);
+        Err("Feedback capture not available".to_string())
+    }
+
+    /// Complete a feedback task and append a short summary to the parent session.
+    async fn feedback_complete(
+        &self,
+        caller_agent_id: &str,
+        input: serde_json::Value,
+    ) -> Result<serde_json::Value, String> {
+        let _ = (caller_agent_id, input);
+        Err("Feedback completion not available".to_string())
+    }
 
     /// Publish a custom event that can trigger proactive agents.
     async fn publish_event(
