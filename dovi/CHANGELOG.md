@@ -4,6 +4,10 @@ This log lists changes made to the OpenFang fork for DoVi. It covers repository 
 
 When adding a fork-specific change, record its purpose, implementation files, source contract, and whether it still needs to live in the runtime. Mark a change as retired if upstream or `dovi-mcp` replaces it.
 
+## 2026-09-27 — Cloud releases paused
+
+- Removed `.github/workflows/release.yml` so pushing a version tag cannot publish GitHub release assets, auto-updater metadata, or container images. Reintroduce a DoVi-specific release workflow when cloud versioning and distribution are in scope.
+
 ## 2026-09-27 — Obi game-development agent
 
 - Added `obi-director` and the Godot, Blender, and prototype-judge skills/templates as deployment copies in `dovi/obi/`. The director coordinates tasks with shared files and calls a narrowly scoped `obipc` MCP bridge on the Windows game-development PC. It does not use `dovi-mcp` as the task ledger.
