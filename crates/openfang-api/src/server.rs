@@ -503,6 +503,10 @@ pub async fn build_router(
             "/api/comms/events/stream",
             axum::routing::get(routes::comms_events_stream),
         )
+        .route(
+            "/api/comms/events/{id}",
+            axum::routing::get(routes::comms_event_detail),
+        )
         .route("/api/comms/send", axum::routing::post(routes::comms_send))
         .route("/api/comms/task", axum::routing::post(routes::comms_task));
 

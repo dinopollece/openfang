@@ -1668,6 +1668,32 @@ impl OpenFangKernel {
             .await
     }
 
+    /// Record a direct message for the communication read model.
+    /// Publishing telemetry does not execute the target agent.
+    async fn record_agent_message(
+        &self,
+        source_id: AgentId,
+        target_id: AgentId,
+        content: &str,
+        correlation_id: Option<EventId>,
+    ) -> EventId {
+        let mut event = Event::new(
+            source_id,
+            EventTarget::Agent(target_id),
+            EventPayload::Message(AgentMessage {
+                content: content.to_string(),
+                metadata: Default::default(),
+                role: MessageRole::Agent,
+            }),
+        );
+        if let Some(id) = correlation_id {
+            event = event.with_correlation(id);
+        }
+        let id = event.id;
+        self.event_bus.publish(event).await;
+        id
+    }
+
     /// Send a multimodal message (text + images) to an agent and get a response.
     ///
     /// Used by channel bridges when a user sends a photo — the image is downloaded,
@@ -6713,6 +6739,40 @@ impl KernelHandle for OpenFangKernel {
             .await
             .map_err(|e| format!("Send failed: {e}"))?;
         Ok(result.response)
+    }
+
+    async fn send_to_agent_from(
+        &self,
+        source_agent_id: &str,
+        agent_id: &str,
+        message: &str,
+    ) -> Result<String, String> {
+        let target_id: AgentId = match agent_id.parse() {
+            Ok(id) => id,
+            Err(_) => self
+                .registry
+                .find_by_name(agent_id)
+                .map(|entry| entry.id)
+                .ok_or_else(|| format!("Agent not found: {agent_id}"))?,
+        };
+        if self.registry.get(target_id).is_none() {
+            return Err(format!("Agent not found: {agent_id}"));
+        }
+        let source_id = source_agent_id.parse::<AgentId>().ok();
+        let exchange_id = if let Some(source_id) = source_id {
+            Some(
+                self.record_agent_message(source_id, target_id, message, None)
+                    .await,
+            )
+        } else {
+            None
+        };
+        let response = self.send_to_agent(agent_id, message).await?;
+        if let (Some(source_id), Some(exchange_id)) = (source_id, exchange_id) {
+            self.record_agent_message(target_id, source_id, &response, Some(exchange_id))
+                .await;
+        }
+        Ok(response)
     }
 
     fn list_agents(&self) -> Vec<kernel_handle::AgentInfo> {

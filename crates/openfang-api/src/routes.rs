@@ -11777,6 +11777,13 @@ fn filter_to_comms_event(
                 target_id: target_id.clone(),
                 target_name: resolve_name(&target_id),
                 detail: openfang_types::truncate_str(&msg.content, 200).to_string(),
+                exchange_id: Some(
+                    event
+                        .correlation_id
+                        .unwrap_or(event.id)
+                        .to_string(),
+                ),
+                reply: event.correlation_id.is_some(),
             })
         }
         EventPayload::Lifecycle(lifecycle) => match lifecycle {
@@ -11789,6 +11796,8 @@ fn filter_to_comms_event(
                 target_id: agent_id.to_string(),
                 target_name: name.clone(),
                 detail: format!("Agent '{}' spawned", name),
+                exchange_id: None,
+                reply: false,
             }),
             LifecycleEvent::Terminated { agent_id, reason } => Some(CommsEvent {
                 id: event.id.to_string(),
@@ -11799,6 +11808,8 @@ fn filter_to_comms_event(
                 target_id: agent_id.to_string(),
                 target_name: resolve_name(&agent_id.to_string()),
                 detail: format!("Terminated: {}", reason),
+                exchange_id: None,
+                reply: false,
             }),
             _ => None,
         },
@@ -11898,6 +11909,8 @@ fn audit_to_comms_event(
             target_label.to_string()
         },
         detail,
+        exchange_id: None,
+        reply: false,
     })
 }
 
@@ -11914,6 +11927,7 @@ pub async fn comms_events(
         .and_then(|v| v.parse::<usize>().ok())
         .unwrap_or(100)
         .min(500);
+    let inter_agent_only = params.get("inter_agent_only").is_some_and(|value| value == "true");
 
     let agents = state.kernel.registry.list();
 
@@ -11931,6 +11945,9 @@ pub async fn comms_events(
 
     for entry in audit_entries.iter().rev() {
         if let Some(ev) = audit_to_comms_event(entry, &agents) {
+            if inter_agent_only && ev.target_id == "user" {
+                continue;
+            }
             if !seen_ids.contains(&ev.id) {
                 comms_events.push(ev);
             }
@@ -11942,6 +11959,28 @@ pub async fn comms_events(
     comms_events.truncate(limit);
 
     Json(comms_events)
+}
+
+/// GET /api/comms/events/{id} — Full detail for an event still in the bus history.
+pub async fn comms_event_detail(
+    State(state): State<Arc<AppState>>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let agents = state.kernel.registry.list();
+    let events = state.kernel.event_bus.history(1000).await;
+    if let Some(event) = events.iter().find(|event| event.id.to_string() == id) {
+        if let Some(mut detail) = filter_to_comms_event(event, &agents) {
+            if let openfang_types::event::EventPayload::Message(message) = &event.payload {
+                detail.detail = message.content.clone();
+            }
+            return (StatusCode::OK, Json(serde_json::json!(detail)));
+        }
+    }
+
+    (
+        StatusCode::NOT_FOUND,
+        Json(serde_json::json!({"error": "Communication event not found"})),
+    )
 }
 
 /// GET /api/comms/events/stream — SSE stream of inter-agent communication events.

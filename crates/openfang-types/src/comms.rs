@@ -66,6 +66,12 @@ pub struct CommsEvent {
     pub target_name: String,
     /// Human-readable detail text.
     pub detail: String,
+    /// Shared identifier for a direct request and its reply, when known.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub exchange_id: Option<String>,
+    /// True when this event is the reply to a direct request.
+    #[serde(default)]
+    pub reply: bool,
 }
 
 /// The kind of inter-agent communication event.

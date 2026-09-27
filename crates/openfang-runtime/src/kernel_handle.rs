@@ -37,6 +37,17 @@ pub trait KernelHandle: Send + Sync {
     /// Send a message to another agent and get the response.
     async fn send_to_agent(&self, agent_id: &str, message: &str) -> Result<String, String>;
 
+    /// Send from a known agent. Runtimes can use the source for communication telemetry.
+    async fn send_to_agent_from(
+        &self,
+        source_agent_id: &str,
+        agent_id: &str,
+        message: &str,
+    ) -> Result<String, String> {
+        let _ = source_agent_id;
+        self.send_to_agent(agent_id, message).await
+    }
+
     /// List all running agents.
     fn list_agents(&self) -> Vec<AgentInfo>;
 
