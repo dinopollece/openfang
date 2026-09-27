@@ -12205,12 +12205,7 @@ fn filter_to_comms_event(
                 target_id: target_id.clone(),
                 target_name: resolve_name(&target_id),
                 detail: openfang_types::truncate_str(&msg.content, 200).to_string(),
-                exchange_id: Some(
-                    event
-                        .correlation_id
-                        .unwrap_or(event.id)
-                        .to_string(),
-                ),
+                exchange_id: Some(event.correlation_id.unwrap_or(event.id).to_string()),
                 reply: event.correlation_id.is_some(),
             })
         }
@@ -12355,7 +12350,9 @@ pub async fn comms_events(
         .and_then(|v| v.parse::<usize>().ok())
         .unwrap_or(100)
         .min(500);
-    let inter_agent_only = params.get("inter_agent_only").is_some_and(|value| value == "true");
+    let inter_agent_only = params
+        .get("inter_agent_only")
+        .is_some_and(|value| value == "true");
 
     let agents = state.kernel.registry.list();
 

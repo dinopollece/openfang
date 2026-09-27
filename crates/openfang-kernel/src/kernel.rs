@@ -7398,8 +7398,10 @@ impl KernelHandle for OpenFangKernel {
             .as_str()
             .ok_or("Missing 'signal' parameter")?;
         if !matches!(signal, "positive" | "negative" | "mixed" | "unclear") {
-            return Err("Invalid feedback signal; expected positive, negative, mixed, or unclear"
-                .to_string());
+            return Err(
+                "Invalid feedback signal; expected positive, negative, mixed, or unclear"
+                    .to_string(),
+            );
         }
         let target = input["target"].as_str().unwrap_or("session");
         let user_note = input["user_note"].as_str().unwrap_or("");
